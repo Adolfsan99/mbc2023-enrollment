@@ -14,6 +14,7 @@ import Buffer "mo:base/Buffer";
 import IC "Ic";
 import HTTP "Http";
 import Type "Types";
+import Float "mo:base/Float";
 
 actor class Verifier() {
   type StudentProfile = Type.StudentProfile;
