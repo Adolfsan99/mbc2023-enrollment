@@ -1,0 +1,15 @@
+{
+  "canisters": {
+    "day5": {
+      "main": "main.mo",
+      "type": "motoko"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": "npx mops sources"
+    }
+  },
+  "version": 1
+}
