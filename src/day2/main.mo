@@ -5,7 +5,7 @@ import Debug "mo:base/Debug";
 import Result "mo:base/Result";
 
 // HOMEWORK DATA
-actor HomeworkDiary {
+actor class Homework() {
   public type Homework = {
     title : Text;
     description : Text;
@@ -17,51 +17,51 @@ actor HomeworkDiary {
   let homeworkDiary = Buffer.Buffer<Homework>(0);
 
   // ADD
-  public shared func addHomework(hw : Homework) : async Nat {
-    homeworkDiary.add(hw);
+  public shared func addHomework(homeWork : Homework) : async Nat {
+    homeworkDiary.add(homeWork);
     return (homeworkDiary.size() - 1);
   };
 
   // GET BY ID
-  public shared func getHomework(hwId : Nat) : async Result.Result<Homework, Text> {
-    if (homeworkDiary.size() <= hwId) {
+  public shared func getHomework(homeWorkId : Nat) : async Result.Result<Homework, Text> {
+    if (homeworkDiary.size() <= homeWorkId) {
       return #err "The requested homeworkID is higher then the homeworkDiary size";
     };
-    let hw = homeworkDiary.get(hwId);
-    return #ok hw;
+    let homeWork = homeworkDiary.get(homeWorkId);
+    return #ok homeWork;
   };
 
   // UPDATE/EDIT BY ID
-  public shared func updateHomework(hwId : Nat, newHw : Homework) : async Result.Result<(), Text> {
-    if (homeworkDiary.size() <= hwId) {
+  public shared func updateHomework(homeWorkId : Nat, newhomeWork : Homework) : async Result.Result<(), Text> {
+    if (homeworkDiary.size() <= homeWorkId) {
       return #err "The requested homeworkID is higher then the homeworkDiary size";
     };
-    homeworkDiary.put(hwId, newHw);
+    homeworkDiary.put(homeWorkId, newhomeWork);
     return #ok();
   };
 
   // MARK AS COMPLETED BY ID
-  public shared func markAsCompleted(hwId : Nat) : async Result.Result<(), Text> {
-    if (homeworkDiary.size() <= hwId) {
+  public shared func markAsCompleted(homeWorkId : Nat) : async Result.Result<(), Text> {
+    if (homeworkDiary.size() <= homeWorkId) {
       return #err "The requested homeworkID is higher then the homeworkDiary size";
     };
-    var hw : Homework = homeworkDiary.get(hwId);
-    var completedHw : Homework = {
-      title = hw.title;
-      description = hw.description;
-      dueDate = hw.dueDate;
+    var homeWork : Homework = homeworkDiary.get(homeWorkId);
+    var completedhomeWork : Homework = {
+      title = homeWork.title;
+      description = homeWork.description;
+      dueDate = homeWork.dueDate;
       completed = true;
     };
-    homeworkDiary.put(hwId, completedHw);
+    homeworkDiary.put(homeWorkId, completedhomeWork);
     return #ok();
   };
 
   // DELETE BY ID
-  public shared func deleteHomework(hwId : Nat) : async Result.Result<(), Text> {
-    if (homeworkDiary.size() <= hwId) {
+  public shared func deleteHomework(homeWorkId : Nat) : async Result.Result<(), Text> {
+    if (homeworkDiary.size() <= homeWorkId) {
       return #err "The requested homeworkID is higher then the homeworkDiary size";
     };
-    let x = homeworkDiary.remove(hwId);
+    let x = homeworkDiary.remove(homeWorkId);
     return #ok();
   };
 
@@ -73,14 +73,14 @@ actor HomeworkDiary {
   // GET ONLY PENDING HOMEWORKS
   public shared func getPendingHomework() : async [Homework] {
     var pending = Buffer.clone(homeworkDiary);
-    pending.filterEntries(func(_, hw) = hw.completed == false);
+    pending.filterEntries(func(_, homeWork) = homeWork.completed == false);
     return Buffer.toArray<Homework>(pending);
   };
 
   // SEARCH BY TEXT
   public shared func searchHomework(searchTerm : Text) : async [Homework] {
     var search = Buffer.clone(homeworkDiary);
-    search.filterEntries(func(_, hw) = Text.contains(hw.title, #text searchTerm) or Text.contains(hw.description, #text searchTerm));
+    search.filterEntries(func(_, homeWork) = Text.contains(homeWork.title, #text searchTerm) or Text.contains(homeWork.description, #text searchTerm));
     return Buffer.toArray<Homework>(search);
   };
 };
