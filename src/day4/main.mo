@@ -6,13 +6,20 @@ import Nat "mo:base/Nat";
 import Hash "mo:base/Hash";
 import Principal "mo:base/Principal";
 
+// IMPORTS Account and RemoteCanister Actors
 import Account "Account";
 import RemoteCanisterActor "RemoteCanisterActor";
-import BootcampLocalActor "BootcampLocalActor";
 
 actor class MotoCoin() {
   public type Account = Account.Account;
 
+  /*  NOTE: In this case use the next variables to have control of the accounts
+   *  account, accountUser, accountNull
+   *  accountBalanceNull, accountNullBalanceTarget
+   *  accountNullTarget, accountNullBalanceTarget
+  */
+
+  //CREATE the MotoCoin object and his values
   stable var coinData = {
     name : Text = "MotoCoin";
     symbol : Text = "MOC";
@@ -21,97 +28,100 @@ actor class MotoCoin() {
 
   var ledger = TrieMap.TrieMap<Account, Nat>(Account.accountsEqual, Account.accountsHash);
 
-  // Returns the name of the token
+  // RETURN The name of the MotoCoin
   public query func name() : async Text {
     return coinData.name;
   };
 
-  // Returns the symbol of the token
+  // RETURN The symbol of the MotoCoin
   public query func symbol() : async Text {
     return coinData.symbol;
   };
 
-  // Returns the total number of tokens on all accounts
+  // RETURN The the total number of MotoCoins on all accounts
   public func totalSupply() : async Nat {
     return coinData.supply;
   };
 
-  // Returns the balance of an account
-  public query func balanceOf(account : Account) : async Nat {
-    let usrAccount : ?Nat = ledger.get(account);
+  // RETURN The balanceOf of the account
+  public query func balanceOf(account : Account) : async (Nat) {
+    let accountUser : ?Nat = ledger.get(account);
 
-    switch (usrAccount) {
-case (null) {
-  return 0;
-};
-case (?accnt) {
-  return accnt;
-};
+    switch (accountUser) {
+      case(null) { return 0 };
+      case(?account) {
+        return account;
+      };
     };
   };
 
-  // Transfer tokens to another account
-  public shared ({ caller }) func transfer(from : Account, to : Account, amount : Nat) : async Result.Result<(), Text> {
-    let xAccount : ?Nat = ledger.get(from);
+  // TRANSFER MotoCoin to another account
+  public shared ({ caller }) func transfer( from : Account, to : Account, amount : Nat ) : async Result.Result<(), Text> {
+    let accountNull : ?Nat = ledger.get(from);
 
-    switch (xAccount) {
-case (null) {
-  return #err ("Your " # coinData.name # " balance is not enough!");
-};
-case (?xActBalance) {
-  if (xActBalance < amount) {
-    return #err ("Your " # coinData.name # " balance is not enough!");
+    switch (accountNull) {
+      case(null) { 
+        return #err ("Your " # coinData.name # " balance is not enough!"); 
+      };
+
+      case(?accountBalanceNull) {
+        if (accountBalanceNull < amount) {
+          return #err ("Your " # coinData.name # " balance is not enough!"); 
+        };
+
+        // UPDATE Sender account balance
+        ignore ledger.replace(from, accountBalanceNull - amount);
+
+        // UPDATE Receiver account balance
+        let accountNullTarget : ?Nat = ledger.get(to);
+        switch (accountNullTarget) {
+          case(null) {
+            ledger.put(to, amount);
+            return #ok ()
+          };
+
+          case(?accountNullBalanceTarget) {
+            ignore ledger.replace(to, accountNullBalanceTarget + amount);
+            return #ok ()
+          }
+        };
+      };
+    };
   };
 
-  // Update sender account balance
-  ignore ledger.replace(from, xActBalance - amount);
-
-  // Update receiver account balance
-  let xTargetAccount : ?Nat = ledger.get(to);
-  switch (xTargetAccount) {
-    case (null) {
-ledger.put(to, amount);
-return #ok ();
-    };
-    case (?xTgtBalance) {
-ignore ledger.replace(to, xTgtBalance + amount);
-return #ok ();
-    };
-  };
-};
-    };
-  };
-
-  // Helper function to add coins to a wallet
+  // HELPER Verify function to add coins to a wallet
   private func addBalance(wallet : Account, amount : Nat) : async () {
-    let xAccount : ?Nat = ledger.get(wallet);
+    let accountNull : ?Nat = ledger.get(wallet);
 
-    switch (xAccount) {
-case (null) {
-  ledger.put(wallet, amount);
-  return ();
-};
-case (?xActBalance) {
-  ignore ledger.replace(wallet, xActBalance + amount);
-  return ();
-};
-    };
+    switch (accountNull) {
+      case(null) { 
+        ledger.put(wallet, amount);
+        
+        return ();
+      };
+
+      case(?accountBalanceNull) {
+        ignore ledger.replace(wallet, accountBalanceNull + amount);
+
+        return ();
+      };
+    }
   };
 
-  // Airdrop 100 MotoCoin to any student that is part of the Bootcamp.
+  // AIRDROP 100 MotoCoins to any student that is part of the Bootcamp.
   public func airdrop() : async Result.Result<(), Text> {
     try {
-var students : [Principal] = await BootcampLocalActor.getAllStudentsPrincipal();
+      var students : [Principal] = await RemoteCanisterActor.RemoteActor.getAllStudentsPrincipal();
 
-for (student in students.vals()) {
-  var studentAccount = {owner = student; subaccount = null};
-  await addBalance(studentAccount, 100);
-  coinData.supply += 100;
-};
+      for (student in students.vals()) {
+        var studentAccount = {owner = student; subaccount = null};
+        await addBalance(studentAccount, 100);
+        coinData.supply += 100;
+      };
 
-return #ok ();
+      return #ok ();
     } catch (e) {
-return #err "Something went wrong!";
+      return #err "Something went wrong!";
     };
   };
 };

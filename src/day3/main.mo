@@ -1,3 +1,4 @@
+//IMPORT The Types necesary to bring the objects used in this project
 import Type "Types";
 import Buffer "mo:base/Buffer";
 import Result "mo:base/Result";
@@ -17,13 +18,13 @@ actor class StudentWall() {
   // KEEP STABLE the message count
   stable var messageIdCount : Nat = 0;
 
-  // CREATE the hash
+  // CREATE the hash (really its very confused this step)
   private func _hashNat(num : Nat) : Hash.Hash = return Text.hash(Nat.toText(num));
   let wall = HashMap.HashMap<Nat, Message>(0, Nat.equal, _hashNat);
 
   // ADD Message in the wall
   public shared ({ caller }) func writeMessage(c : Content) : async Nat {
-    // Id logic
+    // Id for each message logic
     let id : Nat = messageIdCount;
     messageIdCount += 1;
 
@@ -166,7 +167,7 @@ actor class StudentWall() {
     return Buffer.toArray<Message>(messagesBuff);
   };
 
-  // GET All messages ordered by votes
+  // GET All messages ordered by votes (i need help for implement this)
   public func getAllMessagesRanked() : async [Message] {
     let messagesBuff = Buffer.Buffer<Message>(0);
 
@@ -179,12 +180,12 @@ actor class StudentWall() {
     // REVERSE buble sort
     var size = messages.size();
 
-    // SUBSTRACR 1 To size only if size is > than 0 to prevent errors
+    // SUBSTRACT 1 To size, because the arrays always be starts in 0
     if (size > 0) {
       size -= 1;
     };
 
-    // ORDER The messages by votes
+    // SIMPLE Vote rating
     for (a in Iter.range(0, size)) {
       var maxIndex = a;
 
@@ -194,9 +195,9 @@ actor class StudentWall() {
         };
       };
 
-      let tmp = messages[maxIndex];
+      let temporal = messages[maxIndex];
       messages[maxIndex] := messages[a];
-      messages[a] := tmp;
+      messages[a] := temporal;
     };
 
     return Array.freeze<Message>(messages);

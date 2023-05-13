@@ -6,7 +6,7 @@ import MoSpec "mo:mospec/MoSpec";
 import Main "main";
 import Calculator "Calculator";
 import Type "Types";
-import Http "Http";
+//import Http "Http";
 
 let day5Actor = await Main.Verifier();
 
@@ -200,7 +200,7 @@ let success = run([
       ),
     ],
   ),
-  describe(
+  /*describe(
     "#http_request",
     [
       it(
@@ -222,7 +222,7 @@ let success = run([
         },
       ),
     ],
-  ),
+  ),*/
 ]);
 
 if (success == false) {

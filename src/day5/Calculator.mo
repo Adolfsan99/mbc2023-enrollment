@@ -8,7 +8,7 @@ actor class Calculator() {
     return counter;
   };
 
-  public func sub(n : Nat) : async Int {
+  public func sub(n : Int) : async Int {
     counter := counter - n;
     return counter;
   };

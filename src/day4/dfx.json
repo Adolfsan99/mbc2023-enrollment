@@ -1,15 +1,8 @@
 {
-  "canisters": {
-    "day4": {
-      "main": "main.mo",
-      "type": "motoko"
-    }
-  },
-  "defaults": {
-    "build": {
-      "args": "",
-      "packtool": "npx mops sources"
-    }
-  },
-  "version": 1
+	"canisters": {
+		"motoCoin": {
+			"main": "main.mo",
+			"type": "motoko"
+		}
+	}
 }
