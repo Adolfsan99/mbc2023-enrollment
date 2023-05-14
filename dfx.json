@@ -1,9 +1,5 @@
 {
   "canisters": {
-    "first_canister": {
-      "main": "main.mo",
-      "type": "motoko"
-    },
     "day1": {
       "main": "src/day1/main.mo",
       "type": "motoko"
@@ -24,12 +20,5 @@
       "main": "src/day5/main.mo",
       "type": "motoko"
     }
-  },
-  "defaults": {
-    "build": {
-      "args": "",
-      "packtool": "npx mops sources"
-    }
-  },
-  "version": 1
+  }
 }
